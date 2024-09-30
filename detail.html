@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>platform</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        nav {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 5%;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .nav-a {
+            background-color: #4a90e2;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .nav-a:hover {
+            background-color: #357abd;
+        }
+        .detail-item{
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            justify-content: flex-start;
+        }
+        .detail-value {
+            color: #00a59e;
+            margin-left: 30px;
+        }
+        .detail-name {
+            font-weight: bold;
+        }
+        .item-list{
+            text-align: center;
+            width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<!--nav -->
+
+<nav>
+    <div class="nav-container">
+        <a class="nav-a" href="./view.html">Greeting</a>
+        <a class="nav-a" href="./list.html">List</a>
+    </div>
+</nav>
+<div class="item-list">
+    <div class="detail-item">
+        <div class="detail-name">caption</div>
+        <div class="detail-value"><div id="caption-value"></div></div>
+    </div>
+    <div class="detail-item">
+        <div class="detail-name">category</div>
+        <div class="detail-value"><div id="category-value"></div></div>
+    </div>
+    <div class="detail-item">
+        <div class="detail-name">organizer</div>
+        <div class="detail-value"><span id="organizer-value"></span></div>
+    </div>
+    <div class="detail-item">
+        <div class="detail-name">city</div>
+        <div class="detail-value"><span id="city-value"></span></div>
+    </div>
+    <div class="detail-item">
+        <div class="detail-name">target funding</div>
+        <div class="detail-value"><span id="target-funding-value"></span></div>
+    </div>
+    <div class="detail-item">
+        <div class="detail-name">current funding</div>
+        <div class="detail-value"><span id="current-funding-value"></span></div>
+    </div>
+    <button onclick="alert('This feature is under construction')">donation</button>
+</div>
+</body>
+<script>
+    const serverPath = 'http://localhost:3200';
+    // get detail data
+    new Promise((resolve) => {
+        const xml = new XMLHttpRequest();
+        xml.open('get', `${serverPath}/mysql/detail?f_id=${+location.search.split('=')[1]}`, true);
+        xml.send();
+        xml.onreadystatechange = function() {
+            if (xml.readyState === 4 && xml.status == 200) {
+                resolve(JSON.parse(xml.responseText));
+            }
+        }
+    }).then(r => {
+        // set value
+        document.querySelector('#caption-value').innerText = r.caption;
+        document.querySelector('#category-value').innerText = r.name;
+        document.querySelector('#organizer-value').innerText = r.organizer;
+        document.querySelector('#city-value').innerText = r.city;
+        document.querySelector('#target-funding-value').innerText = r.target_funding;
+        document.querySelector('#current-funding-value').innerText = r.current_funding;
+    });
+</script>
+</html>
