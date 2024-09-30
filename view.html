@@ -50,6 +50,125 @@
             max-width: 600px;
             line-height: 1.6;
         }
+        nav {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #d9fffd;
+            padding: 10px;
+        }
+        .nav-a {
+            background-color: #00ECE0;
+            margin: 0 30px;
+            padding: 10px 30px;
+            color: #333333;
+        }
+        .f-list {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+       
+        .f-list select {
+            width: 100px;
+            margin: 0 10px;
+        }
+       
+        button {
+            background-color: #7fbfff; 
+            color: #ffffff;
+            border: none;
+            border-radius: 25px; 
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(127, 191, 255, 0.3);
+        }
+
+        button:hover {
+            background-color: #0066cc; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 102, 204, 0.3);
+        }
+
+        button:active {
+            background-color: #004c99; 
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 76, 153, 0.3);
+        }
+
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(127, 191, 255, 0.5);
+        }
+        select {
+            padding: 5px;
+        }
+        #empty-data {
+            color: #FF0000;
+            text-align: center;
+            margin-top: 10px;
+        }
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #d9fffd;
+        }
+        tr {
+            cursor: pointer;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        nav {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .nav-a {
+            background-color: #4a90e2;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .nav-a:hover {
+            background-color: #357abd;
+        }
+        main {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .message {
+            font-size: 1.5rem;
+            color: #333;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -59,8 +178,156 @@
             <a class="nav-a" href="./list.html">List</a>
         </div>
     </nav>
+    <div class="f-list" >  <!--These are three drop-down boxes include city,organizer and category-->
+        <div class="f-item">
+            <select id="f-city"></select>
+        </div>
+        <div class="f-item">
+            <select id="f-organizer"></select>
+        </div>
+        <div class="f-item">
+            <select id="f-category"></select>
+        </div>
+        <button id="searchBtn">search data</button>
+        <button id="resetBtn">reset data</button>
+    </div>
+    <table cellpadding="10" border="1"><!--Activity list table include five items-->
+        <thead>
+        <tr>
+            <th>Caption</th>
+            <th>Category</th>
+            <th>Organizer</th>
+            <th>City</th>
+            <th>Target Funding</th>
+            <th>Current Funding</th>
+        </tr>
+        </thead>
+        <tbody id="renderTable"></tbody>
+    </table>
+    <div id="empty-data">null data</div>
     <main>
         <p class="message">Welcome to our homepage</p>
     </main>
 </body>
+<script>
+    const serverPath = 'http://localhost:3200';
+    //Create a function to search for data
+    const searchData = () => {  
+        const request = () => {
+            return new Promise((resolve) => {
+                const xml = new XMLHttpRequest();
+                //Joint the queried parameters
+                const searchQuery = `category_id=${document.querySelector('#f-category').value}&organizer=${document.querySelector('#f-organizer').value}&city=${document.querySelector('#f-city').value}`;
+                xml.open('GET', `${serverPath}/mysql/searchData?${searchQuery}`, true);
+                xml.send();
+                xml.onreadystatechange = function() {
+                    if (xml.readyState === 4 && xml.status == 200) {
+                        const r = JSON.parse(xml.responseText);
+                        resolve(r);
+                    }
+                }
+            })
+        }
+        // Render table data
+        request().then(response => {
+            document.querySelector('#renderTable').innerHTML = '';
+            const emptyDom = document.querySelector('#empty-data');
+            emptyDom.style.display = 'none';
+            if (!!response.length) {
+                response.forEach(u => {
+                    // Create table rows and populate them with data
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                    <td><a href="./detail.html?f_id=${u.fundraiser_id}">${u.caption}</a></td>
+                    <td>${u.name}</td>
+                    <td>${u.organizer}</td>
+                    <td>${u.city}</td>
+                    <td>${u.target_funding}</td>
+                    <td>${u.current_funding}</td>
+            `;
+                    // Adds a table row to the table
+                    document.querySelector('#renderTable').appendChild(tr);
+                });
+            } else {
+                // Empty data tip
+                emptyDom.style.display = 'block';
+            }
+        });
+    }
+    // Create a function that reset the data
+    function resetData() {
+        // Clear the filtered options
+        document.querySelector('#f-city').value = '';
+        document.querySelector('#f-category').value = '';
+        document.querySelector('#f-organizer').value = '';
+        setTimeout(() => {
+            searchData();
+        });
+    }
+    window.onload = () => {
+        // Add click listener
+        document.getElementById('searchBtn').addEventListener('click', searchData);
+        document.getElementById('resetBtn').addEventListener('click', resetData);
+    };
+    // Init data
+    searchData();
+
+    // Get category's option
+    const xml = new XMLHttpRequest();
+    xml.open('get', `${serverPath}/mysql/category`, true);
+    xml.send();
+    xml.onreadystatechange = function() {
+        if (xml.readyState === 4 && xml.status == 200) {
+            const r = JSON.parse(xml.responseText);
+            // Add disabled option
+            document.querySelector('#f-category').innerHTML = `<option disabled selected value="">category</option>`;
+            // Add option
+            r.forEach(u => {
+                const o = document.createElement('option');
+                o.innerHTML = u.name;
+                o.value = u.category_id;
+                document.querySelector('#f-category').appendChild(o);
+            });
+        }
+    }
+
+    // Get organizer's option
+    const xml1 = new XMLHttpRequest();
+    xml1.open('get', `${serverPath}/mysql/organizer`, true);
+    xml1.send();
+    xml1.onreadystatechange = function() {
+        if (xml1.readyState === 4 && xml1.status == 200) {
+            const r = JSON.parse(xml1.responseText);
+            // Add disabled option
+            document.querySelector('#f-organizer').innerHTML = `<option disabled selected value="">organizer</option>`;
+            // Add option
+            r.forEach(u => {
+                const o = document.createElement('option');
+                o.value = u.organizer;
+                o.innerHTML = u.organizer;
+                document.querySelector('#f-organizer').appendChild(o);
+            });
+        }
+    }
+
+    // Get city's option
+    const xml2 = new XMLHttpRequest();
+    xml2.open('get', `${serverPath}/mysql/city`, true);
+    xml2.send();
+    xml2.onreadystatechange = function() {
+        if (xml2.readyState === 4 && xml2.status == 200) {
+            const r = JSON.parse(xml2.responseText);
+            console.log(r);
+            // Add disabled option
+            document.querySelector('#f-city').innerHTML = `<option disabled selected value="">city</option>`;
+            // Add option
+            r.forEach(u => {
+                const o = document.createElement('option');
+                o.value = u.city;
+                o.innerHTML = u.city;
+                document.querySelector('#f-city').appendChild(o);
+            });
+        }
+    }
+</script>
 </html>
