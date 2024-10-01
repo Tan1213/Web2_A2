@@ -1,3 +1,7 @@
+//  https://github.com/Tan1213/Web2_A2
+
+
+
 const mySql = require('mysql');
 
 // Connect to the database
@@ -12,13 +16,13 @@ dbConnect.connect();
 
 const router = require('express').Router();
 
-// search sql
+// Search sql
 const sql1 = `select cate.name, fund.* from category cate join fundraiser fund on fund.category_id = cate.category_id where (fund.city = ? or ? = '') and (fund.organizer = ? or ? = '') and (fund.category_id = ? or ? = '') and (fund.active = 1)`;
 const sql2 = `select cate.name, fund.* from category cate join fundraiser fund on fund.category_id = cate.category_id where fund.fundraiser_id = ?`;
 const sql3 = `select organizer from fundraiser`;
 const sql4 = `select * from category`;
 const sql5 = `select city from fundraiser`;
-// search fundraiser
+// Search fundraiser
 router.get('/searchData', (request, response) => {
         const query = request.query;
         for (const key in request.query) {
@@ -29,7 +33,7 @@ router.get('/searchData', (request, response) => {
             response.send(data)
         });
     })
-    // search detail
+    // Search detail
     .get('/detail', (request, response) => {
         const query = request.query;
         const arr = [query.f_id];
@@ -37,19 +41,19 @@ router.get('/searchData', (request, response) => {
             response.send(data[0])
         });
     })
-    // search organizer
+    // Search organizer
     .get('/organizer', (request, response) => {
         dbConnect.query(sql3, function(err, data) {
             response.send(data)
         });
     })
-    // search category
+    // Search category
     .get('/category', (request, response) => {
         dbConnect.query(sql4, function(err, data) {
             response.send(data)
         });
     })
-    // search city
+    // Search city
     .get('/city', (request, response) => {
         dbConnect.query(sql5, function(err, data) {
             response.send(data)
