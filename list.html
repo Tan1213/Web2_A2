@@ -129,8 +129,8 @@
 <body>
 <!--nav -->
 <nav>
-    <a class="nav-a" href="./view.html">greeting</a>
-    <a class="nav-a" href="./list.html">list</a>
+    <a class="nav-a" href="/Homepage">Greeting</a>
+    <a class="nav-a" href="/searchpage">List</a>
 </nav>
 <div class="f-list">  <!--These are three drop-down boxes include city,organizer and category-->
     <div class="f-item">
@@ -190,7 +190,7 @@
                     // Create table rows and populate them with data
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                    <td><a href="./detail.html?f_id=${u.fundraiser_id}">${u.caption}</a></td>
+                    <td><a href="./Fundraiserpage?f_id=${u.fundraiser_id}">${u.caption}</a></td>
                     <td>${u.name}</td>
                     <td>${u.organizer}</td>
                     <td>${u.city}</td>
